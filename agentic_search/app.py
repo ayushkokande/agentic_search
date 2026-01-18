@@ -13,7 +13,7 @@ def main():
 
     # Initialize graph and state
     graph = build_agent_graph()
-    initial_state = SearchState(
+    initial_state = SearchState(  
         messages=[HumanMessage(content=query)],
         query=query,
         domain="",

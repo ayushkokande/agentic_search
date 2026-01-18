@@ -1,0 +1,1 @@
+# Generic domain package

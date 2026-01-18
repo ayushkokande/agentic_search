@@ -1,8 +1,8 @@
 import streamlit as st
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
-from core.graph import build_agent_graph
-from core.state import SearchState
-from ui.formatters import places_to_dataframe
+from agentic_search.core.graph import build_agent_graph
+from agentic_search.core.state import SearchState
+from agentic_search.ui.formatters import places_to_dataframe
 
 def main():
     st.title("Agentic Search Interface")
@@ -36,7 +36,7 @@ def main():
         elif isinstance(msg, AIMessage):
             st.markdown(f"**Agent:** {msg.content}")
         elif isinstance(msg, ToolMessage):
-            st.markdown(f"**Tool ({msg.name}) output:** {msg.text}")
+            st.markdown(f"**Tool ({msg.name}) output:** {msg.content}")
 
     # Display final results
     st.header("Final Results")

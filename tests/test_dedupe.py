@@ -1,4 +1,4 @@
-from core.utils import dedupe_places
+from agentic_search.core.utils import dedupe_places
 
 def test_dedupe_places():
     places = [

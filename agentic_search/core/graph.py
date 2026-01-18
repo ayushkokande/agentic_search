@@ -1,12 +1,10 @@
-print("USING graph.py FROM:", __file__)
-
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage
 from typing import Dict
 
-from core.state import SearchState
+from core.types import SearchState
 from core.prompts import PROMPT_PARSE, PROMPT_EXPAND, PROMPT_RELAX
 from core.policies import decide_relax
 from core.scoring import rank_places
@@ -73,9 +71,9 @@ def build_agent_graph() -> StateGraph:
         for place in places:
             name = place["name"]
             # Compute commute and hours via tools
-            commute = compute_commute.invoke(name, user_loc)
-            hours = get_hours.invoke(name)
-            trust = assess_trust.invoke(name)
+            commute = compute_commute.invoke({"place_name": name, "user_location": user_loc})
+            hours = get_hours.invoke({"place_name": name})
+            trust = assess_trust.invoke({"place_name": name})
             enriched.append({
                 "name": name,
                 "address": place.get("address", ""),

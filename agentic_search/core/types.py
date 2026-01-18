@@ -1,5 +1,5 @@
 from typing import TypedDict, Annotated, List
-from langchain_core import HumanMessage, AIMessage, ToolMessage
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from langgraph.graph.message import add_messages
 
 # Define the structure of a Place result

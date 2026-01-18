@@ -1,13 +1,14 @@
 print("USING graph.py FROM:", __file__)
 
-from langgraph.graph import StateGraph, START, END
-from langgraph.prebuilt import ToolNode
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, AIMessage
+import json
 from typing import Dict
 
+from langgraph.graph import StateGraph, START, END
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+
 from core.state import SearchState
-from core.prompts import PROMPT_PARSE, PROMPT_EXPAND, PROMPT_RELAX
+from core.prompts import PROMPT_PARSE, PROMPT_RELAX
 from core.policies import decide_relax
 from core.scoring import rank_places
 from core.utils import dedupe_places
@@ -61,9 +62,21 @@ def build_agent_graph() -> StateGraph:
         return {"expanded_query": new_query}
 
     # Node: Retrieve places (using stubbed Google Places), with caching
-    # We use ToolNode for the search_places tool
-    # Note: Graph automatically uses state["expanded_query"] as input for the tool
-    tool_node_search = ToolNode([search_places])
+    def retrieve_places(state: SearchState) -> Dict:
+        query = state.get("expanded_query") or state.get("query", "")
+        if not query:
+            return {"places": []}
+        cached = get_cached(query)
+        if cached is not None:
+            return {"places": cached}
+        results = search_places.invoke({"query": query}) or []
+        set_cached(query, results)
+        tool_msg = ToolMessage(
+            name="search_places",
+            content=json.dumps(results, ensure_ascii=True),
+            tool_call_id="search_places"
+        )
+        return {"places": results, "messages": [tool_msg]}
 
     # Node: Enrich results with hours, commute, trust
     def enrich(state: SearchState) -> Dict:
@@ -73,9 +86,9 @@ def build_agent_graph() -> StateGraph:
         for place in places:
             name = place["name"]
             # Compute commute and hours via tools
-            commute = compute_commute.invoke(name, user_loc)
-            hours = get_hours.invoke(name)
-            trust = assess_trust.invoke(name)
+            commute = compute_commute.invoke({"place_name": name, "user_location": user_loc})
+            hours = get_hours.invoke({"place_name": name})
+            trust = assess_trust.invoke({"place_name": name})
             enriched.append({
                 "name": name,
                 "address": place.get("address", ""),
@@ -128,7 +141,7 @@ def build_agent_graph() -> StateGraph:
     # Build graph nodes
     graph.add_node(parse_query, name="parse_query")
     graph.add_node(expand_query, name="expand_query")
-    graph.add_node("retrieve", tool_node_search)  # ToolNode for search_places
+    graph.add_node(retrieve_places, name="retrieve")
     graph.add_node(enrich, name="enrich")
     graph.add_node(filter_results, name="filter_results")
     graph.add_node(rank_results, name="rank_results")

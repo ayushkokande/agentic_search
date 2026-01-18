@@ -14,4 +14,4 @@ We use `ChatOpenAI` for LLM-based steps (prompt parsing, query expansion, relaxa
 
 **Installation:** See `pyproject.toml` for dependencies. Ensure you have an OpenAI API key in environment (or set it in `.env`). Run with:
 ```bash
-streamlit run src/app.py
+streamlit run agentic_search/app.py

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-search"
+version = "0.1.0"
+description = "Agentic search loop with LangGraph and LangChain (stubbed Google APIs)."
+requires-python = ">=3.9"
+
+dependencies = [
+  "langgraph",
+  "langchain",
+  "langchain-openai",
+  "langchain-community",
+  "streamlit",
+  "pydantic",
+  "python-dotenv",
+  "pandas",
+  "pytest"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

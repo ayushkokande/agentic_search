@@ -36,7 +36,7 @@ def main():
         elif isinstance(msg, AIMessage):
             st.markdown(f"**Agent:** {msg.content}")
         elif isinstance(msg, ToolMessage):
-            st.markdown(f"**Tool ({msg.name}) output:** {msg.text}")
+            st.markdown(f"**Tool ({msg.name}) output:** {msg.content}")
 
     # Display final results
     st.header("Final Results")

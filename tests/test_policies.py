@@ -1,4 +1,4 @@
-from core.policies import decide_relax
+from agentic_search.core.policies import decide_relax
 
 def test_decide_relax_empty():
     state = {"filtered": []}

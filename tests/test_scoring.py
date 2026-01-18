@@ -1,5 +1,5 @@
 import pytest
-from core.scoring import rank_places
+from agentic_search.core.scoring import rank_places
 
 def test_rank_by_trust():
     places = [

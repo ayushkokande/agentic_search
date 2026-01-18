@@ -7,7 +7,7 @@ from langgraph.graph import StateGraph, START, END
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 
-from core.types import SearchState
+from core.state import SearchState
 from config import OPENAI_API_KEY
 from core.prompts import PROMPT_PARSE, PROMPT_RELAX
 from core.policies import decide_relax

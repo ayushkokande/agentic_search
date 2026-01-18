@@ -1,31 +1,29 @@
-print("USING graph.py FROM:", __file__)
-
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage
 from typing import Dict
 
-from core.state import SearchState
-from core.prompts import PROMPT_PARSE, PROMPT_EXPAND, PROMPT_RELAX
-from core.policies import decide_relax
-from core.scoring import rank_places
-from core.utils import dedupe_places
+from agentic_search.core.types import SearchState
+from agentic_search.core.prompts import PROMPT_PARSE, PROMPT_EXPAND, PROMPT_RELAX
+from agentic_search.core.policies import decide_relax
+from agentic_search.core.scoring import rank_places
+from agentic_search.core.utils import dedupe_places
 
-import domains.generic.ontology as gen_ont
-import domains.generic.query_expansion as gen_expand
-import domains.generic.constraints as gen_constraints
-import domains.generic.postprocess as gen_post
-import domains.healthcare.ontology as hc_ont
-import domains.healthcare.query_expansion as hc_expand
-import domains.healthcare.constraints as hc_constraints
-import domains.healthcare.postprocess as hc_post
+import agentic_search.domains.generic.ontology as gen_ont
+import agentic_search.domains.generic.query_expansion as gen_expand
+import agentic_search.domains.generic.constraints as gen_constraints
+import agentic_search.domains.generic.postprocess as gen_post
+import agentic_search.domains.healthcare.ontology as hc_ont
+import agentic_search.domains.healthcare.query_expansion as hc_expand
+import agentic_search.domains.healthcare.constraints as hc_constraints
+import agentic_search.domains.healthcare.postprocess as hc_post
 
-from tools.places_google import search_places
-from tools.commute_google import compute_commute
-from tools.hours_google import get_hours
-from tools.trust import assess_trust
-from tools.cache import get_cached, set_cached
+from agentic_search.tools.places_google import search_places
+from agentic_search.tools.commute_google import compute_commute
+from agentic_search.tools.hours_google import get_hours
+from agentic_search.tools.trust import assess_trust
+from agentic_search.tools.cache import get_cached, set_cached
 
 def build_agent_graph() -> StateGraph:
     """
@@ -73,9 +71,9 @@ def build_agent_graph() -> StateGraph:
         for place in places:
             name = place["name"]
             # Compute commute and hours via tools
-            commute = compute_commute.invoke(name, user_loc)
-            hours = get_hours.invoke(name)
-            trust = assess_trust.invoke(name)
+            commute = compute_commute.invoke({"place_name": name, "user_location": user_loc})
+            hours = get_hours.invoke({"place_name": name})
+            trust = assess_trust.invoke({"place_name": name})
             enriched.append({
                 "name": name,
                 "address": place.get("address", ""),
